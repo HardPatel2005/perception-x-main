@@ -24,6 +24,17 @@ public/react-build/
 **/build/
 **/dist/
 
+# Large media / model artifacts
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.pt
+*.onnx
+*.h5
+*.pkl
+*.weights
+
 # Logs and temp files
 *.log
 logs/
