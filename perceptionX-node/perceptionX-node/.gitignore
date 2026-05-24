@@ -1,0 +1,31 @@
+# Node.js / React build artifacts
+node_modules/
+client/node_modules/
+public/react-build/
+build/
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+upload-run.log
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Runtime caches
+coverage/
+.cache/
+tmp/
+temp/
+
+# Misc
+npm-debug.log*

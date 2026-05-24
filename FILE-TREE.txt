@@ -1,0 +1,236 @@
+├── perceptionX-node
+│   └── perceptionX-node
+│       ├── app.js
+│       ├── app.py
+│       ├── check_cloudinary_usage.js
+│       ├── check_env.js
+│       ├── cleanup_cloudinary.js
+│       ├── client
+│       │   ├── index.html
+│       │   ├── package-lock.json
+│       │   ├── package.json
+│       │   ├── postcss.config.js
+│       │   ├── public
+│       │   │   ├── assets
+│       │   │   │   ├── hero-video.mp4
+│       │   │   │   ├── image (1).png
+│       │   │   │   ├── image (2).png
+│       │   │   │   ├── image.png
+│       │   │   │   └── perceptionX12.png
+│       │   │   ├── css
+│       │   │   │   └── style.css
+│       │   │   └── models
+│       │   │       └── cube
+│       │   │           ├── license.txt
+│       │   │           ├── scene.bin
+│       │   │           └── scene.gltf
+│       │   ├── README.md
+│       │   ├── SETUP_TAILWIND.md
+│       │   ├── src
+│       │   │   ├── App.jsx
+│       │   │   ├── components
+│       │   │   │   ├── AnalyticsDashboard.css
+│       │   │   │   ├── AnalyticsDashboard.jsx
+│       │   │   │   ├── AnalyticsDetail.css
+│       │   │   │   ├── AnalyticsDetail.jsx
+│       │   │   │   ├── dashboard
+│       │   │   │   │   ├── restaurant-monitoring
+│       │   │   │   │   │   ├── AlertsPanel.jsx
+│       │   │   │   │   │   ├── AnomalyTimelineViz.jsx
+│       │   │   │   │   │   ├── CategoryDistributionChart.jsx
+│       │   │   │   │   │   ├── ConfidenceSection.jsx
+│       │   │   │   │   │   ├── constants.js
+│       │   │   │   │   │   ├── CorrelationScatter.jsx
+│       │   │   │   │   │   ├── DetectionHistogram.jsx
+│       │   │   │   │   │   ├── DiningTableTimeline.jsx
+│       │   │   │   │   │   ├── KPICards.jsx
+│       │   │   │   │   │   ├── ObjectDistributionChart.jsx
+│       │   │   │   │   │   ├── OccupancyOverTime.jsx
+│       │   │   │   │   │   ├── PerformanceSection.jsx
+│       │   │   │   │   │   ├── RawDataTable.jsx
+│       │   │   │   │   │   ├── RestaurantDashboard.jsx
+│       │   │   │   │   │   ├── RestaurantDensityTrend.jsx
+│       │   │   │   │   │   ├── RestaurantPreview.jsx
+│       │   │   │   │   │   ├── SeatFillRate.jsx
+│       │   │   │   │   │   ├── SeatingUtilization.jsx
+│       │   │   │   │   │   └── TemporalTrends.jsx
+│       │   │   │   │   ├── shared
+│       │   │   │   │   │   └── Sidebar.jsx
+│       │   │   │   │   ├── traffic-monitoring
+│       │   │   │   │   │   ├── AlertsPanel.jsx
+│       │   │   │   │   │   ├── BehavioralAnalytics.jsx
+│       │   │   │   │   │   ├── ChartsGrid.jsx
+│       │   │   │   │   │   ├── ConfidenceAnalytics.jsx
+│       │   │   │   │   │   ├── CongestionIntelligence.jsx
+│       │   │   │   │   │   ├── DensityLevels.jsx
+│       │   │   │   │   │   ├── DetectionAlerts.jsx
+│       │   │   │   │   │   ├── InfrastructureMonitoring.jsx
+│       │   │   │   │   │   ├── KPICards.jsx
+│       │   │   │   │   │   ├── LogsTable.jsx
+│       │   │   │   │   │   ├── ObjectDistribution.jsx
+│       │   │   │   │   │   ├── PerformanceChart.jsx
+│       │   │   │   │   │   ├── PerformanceChartCard.jsx
+│       │   │   │   │   │   ├── PerformanceMonitoring.jsx
+│       │   │   │   │   │   ├── RiskSafetyIntelligence.jsx
+│       │   │   │   │   │   ├── SceneDensity.jsx
+│       │   │   │   │   │   ├── SceneOverview.jsx
+│       │   │   │   │   │   ├── StatCards.jsx
+│       │   │   │   │   │   ├── TemporalDetectionTrends.jsx
+│       │   │   │   │   │   ├── TemporalTrends.jsx
+│       │   │   │   │   │   ├── Topbar.jsx
+│       │   │   │   │   │   ├── TrafficFlowIntelligence.jsx
+│       │   │   │   │   │   ├── TrafficMonitoringDashboard.jsx
+│       │   │   │   │   │   ├── VideoPreviewCard.jsx
+│       │   │   │   │   │   └── VideoSnapshot.jsx
+│       │   │   │   │   └── wildlife-monitoring
+│       │   │   │   │       └── WildlifeDashboard.jsx
+│       │   │   │   ├── FileDisplay.css
+│       │   │   │   ├── FileDisplay.jsx
+│       │   │   │   ├── Footer.jsx
+│       │   │   │   ├── Home3D.jsx
+│       │   │   │   ├── Login.jsx
+│       │   │   │   ├── Logo.jsx
+│       │   │   │   ├── Navbar.jsx
+│       │   │   │   ├── ProgressBar.css
+│       │   │   │   ├── ProgressBar.jsx
+│       │   │   │   ├── Signup.jsx
+│       │   │   │   └── ThreeScene.jsx
+│       │   │   ├── context
+│       │   │   │   └── AuthContext.jsx
+│       │   │   ├── css
+│       │   │   │   └── style.css
+│       │   │   ├── hooks
+│       │   │   │   ├── useFileUpload.js
+│       │   │   │   └── useSocket.js
+│       │   │   ├── index.css
+│       │   │   ├── lib
+│       │   │   │   └── utils.js
+│       │   │   ├── main.jsx
+│       │   │   ├── pages
+│       │   │   │   ├── Analytics.css
+│       │   │   │   ├── Analytics.jsx
+│       │   │   │   ├── Detect.css
+│       │   │   │   ├── Detect.jsx
+│       │   │   │   ├── Home.jsx
+│       │   │   │   ├── LiveDetect.css
+│       │   │   │   ├── LiveDetect.jsx
+│       │   │   │   ├── Result.css
+│       │   │   │   └── Result.jsx
+│       │   │   └── utils
+│       │   │       └── axiosConfig.js
+│       │   ├── tailwind.config.js
+│       │   └── vite.config.js
+│       ├── CLOUDINARY_SETUP.md
+│       ├── middleware
+│       │   └── auth.js
+│       ├── models
+│       │   ├── perceps.js
+│       │   └── User.js
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── public
+│       │   ├── assets
+│       │   │   ├── dark.mp4
+│       │   │   ├── image (1).png
+│       │   │   ├── image (2).png
+│       │   │   ├── image.png
+│       │   │   ├── perceptionX12.png
+│       │   │   ├── treeback.jpg
+│       │   │   ├── triquetra2.png
+│       │   │   └── triquetra4.png
+│       │   ├── css
+│       │   │   └── style.css
+│       │   ├── js
+│       │   │   ├── main.js
+│       │   │   └── script.js
+│       │   ├── models
+│       │   │   ├── cube
+│       │   │   │   ├── license.txt
+│       │   │   │   ├── scene.bin
+│       │   │   │   └── scene.gltf
+│       │   │   ├── dino
+│       │   │   │   ├── license.txt
+│       │   │   │   ├── scene.bin
+│       │   │   │   ├── scene.gltf
+│       │   │   │   └── textures
+│       │   │   │       └── material_baseColor.png
+│       │   │   ├── EBloxx.fbx
+│       │   │   ├── eye
+│       │   │   │   ├── license.txt
+│       │   │   │   ├── scene.bin
+│       │   │   │   ├── scene.gltf
+│       │   │   │   └── textures
+│       │   │   │       ├── CORNEA_normal.png
+│       │   │   │       ├── IRIS_FINAL_baseColor.jpeg
+│       │   │   │       ├── IRIS_FINAL_metallicRoughness.png
+│       │   │   │       └── IRIS_FINAL_normal.jpeg
+│       │   │   └── squid
+│       │   │       ├── license.txt
+│       │   │       ├── scene.bin
+│       │   │       ├── scene.gltf
+│       │   │       └── textures
+│       │   │           ├── material_0_baseColor.png
+│       │   │           ├── material_0_metallicRoughness.png
+│       │   │           └── material_0_normal.png
+│       │   ├── processed
+│       │   ├── react-build
+│       │   │   ├── assets
+│       │   │   │   ├── hero-video.mp4
+│       │   │   │   ├── image (1).png
+│       │   │   │   ├── image (2).png
+│       │   │   │   ├── image.png
+│       │   │   │   ├── index-BE00uJfW.js
+│       │   │   │   ├── index-BVhQMot4.css
+│       │   │   │   └── perceptionX12.png
+│       │   │   ├── css
+│       │   │   │   └── style.css
+│       │   │   ├── index.html
+│       │   │   └── models
+│       │   │       └── cube
+│       │   │           ├── license.txt
+│       │   │           ├── scene.bin
+│       │   │           └── scene.gltf
+│       │   └── uploads
+│       ├── REACT_MIGRATION.md
+│       ├── render.yaml
+│       ├── routes
+│       │   ├── auth.js
+│       │   └── uploads
+│       ├── scripts
+│       ├── SETUP_REACT.md
+│       ├── START_SERVICES.md
+│       ├── utils
+│       │   ├── analytics-detection.js
+│       │   ├── analytics-restaurant.js
+│       │   ├── analytics-wildlife.js
+│       │   └── analytics.js
+│       └── yolov11
+│           └── best11.pt
+└── perceptionX-python
+    └── perceptionX-python
+        ├── app.py
+        ├── byte_tracker.py
+        ├── check_env.py
+        ├── CLOUDINARY_TROUBLESHOOTING.md
+        ├── Dockerfile
+        ├── DUPLICATE_PROCESSING_FIX.md
+        ├── FIXES_SUMMARY.md
+        ├── gitattributes
+        ├── gitignore
+        ├── modal_client.py
+        ├── MODAL_DEBUG.md
+        ├── MODAL_INTEGRATION_SUMMARY.md
+        ├── modal_processor.py
+        ├── MODAL_SETUP.md
+        ├── OPTIMIZATION_SUMMARY.md
+        ├── PIPELINE_OPTIMIZATIONS.md
+        ├── QUICK_START_MODAL.md
+        ├── README.md
+        ├── requirements.txt
+        ├── yolov11
+        │   └── best.pt
+        └── __pycache__
+            ├── app.cpython-312.pyc
+            ├── byte_tracker.cpython-312.pyc
+            ├── modal_client.cpython-312.pyc
+            └── modal_processor.cpython-312.pyc

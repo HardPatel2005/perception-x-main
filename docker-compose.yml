@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # Node.js Express Backend
+  node-backend:
+    build:
+      context: ./perceptionX-node/perceptionX-node
+      dockerfile: Dockerfile
+    container_name: perceptionx-node
+    ports:
+      - "3000:3000"
+    environment:
+      # Core Configuration
+      NODE_ENV: production
+      PORT: 3000
+      
+      # MongoDB
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: perceptionx
+      
+      # Cloudinary (Optimized Settings)
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      CLOUDINARY_CHUNK_SIZE: "3145728"           # 3MB chunks (fixes ECONNRESET on large files)
+      CLOUDINARY_UPLOAD_TIMEOUT_MS: "1200000"    # 20 minutes
+      
+      # Python Service URL
+      PYTHON_API_URL: http://python-backend:8001
+      
+      # JWT (Change in production!)
+      JWT_SECRET: ${JWT_SECRET:-your_long_random_secret_key_change_in_production}
+      
+      # Clerk Auth (if using)
+      REACT_APP_CLERK_PUBLISHABLE_KEY: ${REACT_APP_CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      
+    depends_on:
+      - python-backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - node_logs:/app/logs
+    networks:
+      - perceptionx-network
+
+  # Python FastAPI Backend
+  python-backend:
+    build:
+      context: ./perceptionX-python/perceptionX-python
+      dockerfile: Dockerfile
+    container_name: perceptionx-python
+    ports:
+      - "8001:8001"
+    environment:
+      # Core Configuration
+      PYTHON_ENV: production
+      WORKERS: 2
+      
+      # MongoDB
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: perceptionx
+      
+      # Cloudinary
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      
+      # Modal GPU Configuration
+      USE_MODAL_GPU: 'true'
+      MODAL_SECRET_NAME: 'perceptionx-secrets'
+      MODAL_APP_NAME: 'perceptionx-video-processor'
+      MODAL_TOKEN_ID: ${MODAL_TOKEN_ID}
+      MODAL_TOKEN_SECRET: ${MODAL_TOKEN_SECRET}
+      
+      # Optional: Use CPU if Modal fails
+      USE_CPU_FALLBACK: 'true'
+      
+      # Logging
+      LOG_LEVEL: INFO
+      
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - python_logs:/app/logs
+      - /tmp:/tmp  # For temporary video processing
+    networks:
+      - perceptionx-network
+
+networks:
+  perceptionx-network:
+    driver: bridge
+
+volumes:
+  node_logs:
+    driver: local
+  python_logs:
+    driver: local

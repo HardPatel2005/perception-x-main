@@ -1,0 +1,88 @@
+.detect-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#upload-form {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 1px solid rgba(138, 43, 226, 0.2);
+}
+
+#upload-form h2 {
+  color: #8A2BE2;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.upload-box {
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 60px 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(138, 43, 226, 0.05);
+}
+
+.upload-box:hover,
+.upload-box.drag-active {
+  border-color: #8A2BE2;
+  background: rgba(138, 43, 226, 0.1);
+  transform: scale(1.02);
+}
+
+.upload-box p {
+  margin: 15px 0 0 0;
+  color: #e0e0e0;
+  font-size: 16px;
+}
+
+.upload-box .file-name {
+  margin-top: 10px;
+  color: #8A2BE2;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#uploadForm button {
+  width: 100%;
+  margin-top: 30px;
+  padding: 15px;
+  background: linear-gradient(135deg, #8A2BE2 0%, #9370DB 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#uploadForm button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
+}
+
+.error-message {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: rgba(255, 0, 0, 0.1);
+  border-radius: 8px;
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.error-message h4 {
+  margin: 0 0 10px 0;
+}
+
+.error-message p {
+  margin: 0;
+}

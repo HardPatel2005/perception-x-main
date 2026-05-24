@@ -1,0 +1,49 @@
+# Root ignore for the whole monorepo
+
+# Dependency folders
+node_modules/
+**/node_modules/
+.venv/
+.venv*/
+venv/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build outputs
+build/
+dist/
+coverage/
+public/react-build/
+**/build/
+**/dist/
+
+# Logs and temp files
+*.log
+logs/
+tmp/
+temp/
+upload-run.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Git / package manager noise
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

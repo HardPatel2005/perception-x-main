@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-[#1a1a2e] text-white font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Hero CTA Buttons */
+.intro-btn-action {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.hero-ac-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 170px;
+  padding: 11px 22px;
+  border: 2px solid #111111;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  isolation: isolate;
+}
+
+.hero-ac-btn:link,
+.hero-ac-btn:visited {
+  text-decoration: none;
+}
+
+.hero-btn-label {
+  position: relative;
+  z-index: 2;
+  color: inherit;
+  font-size: 18px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.hero-ring {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, 100%, 0);
+  transition: transform 0.24s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.hero-ring.one {
+  transition-duration: 0.14s;
+}
+
+.hero-ring.two {
+  transition-duration: 0.2s;
+}
+
+.hero-ring.three {
+  transition-duration: 0.28s;
+}
+
+.hero-ac-btn.hero-btn-primary {
+  background: #000000;
+  color: #ffffff;
+}
+
+.hero-ac-btn.hero-btn-primary:link,
+.hero-ac-btn.hero-btn-primary:visited,
+.hero-ac-btn.hero-btn-primary:hover,
+.hero-ac-btn.hero-btn-primary:active {
+  color: #ffffff;
+}
+
+.hero-ac-btn.hero-btn-primary .hero-ring.one {
+  background: #1f1f1f;
+}
+
+.hero-ac-btn.hero-btn-primary .hero-ring.two {
+  background: #101010;
+}
+
+.hero-ac-btn.hero-btn-primary .hero-ring.three {
+  background: #000000;
+}
+
+.hero-ac-btn.hero-btn-secondary {
+  background: #ffffff;
+  color: #111111;
+}
+
+.hero-ac-btn.hero-btn-secondary:link,
+.hero-ac-btn.hero-btn-secondary:visited,
+.hero-ac-btn.hero-btn-secondary:hover,
+.hero-ac-btn.hero-btn-secondary:active {
+  color: #111111;
+}
+
+.hero-ac-btn.hero-btn-secondary .hero-ring.one {
+  background: #f3f4f6;
+}
+
+.hero-ac-btn.hero-btn-secondary .hero-ring.two {
+  background: #e7e9ee;
+}
+
+.hero-ac-btn.hero-btn-secondary .hero-ring.three {
+  background: #dfe3ea;
+}
+
+.hero-ac-btn:hover {
+  box-shadow: 5px 5px 0 #111111, -5px -5px 0 #111111;
+  transform: translate(-1px, 1px);
+}
+
+.hero-ac-btn:hover .hero-ring {
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-ac-btn.hero-btn-primary:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .intro-btn-action {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hero-ac-btn {
+    min-width: 170px;
+    padding: 12px 18px;
+  }
+
+  .hero-btn-label {
+    font-size: 16px;
+  }
+}
+
+/* Horizontal Scrolling Animation for Technologies */
+@keyframes scroll-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  will-change: transform;
+}
+
+/* Minimalist Icon Styles with Top Cut Hover Effect */
+.tech-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: transparent;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.tech-icon-container:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tech-icon-wrapper {
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tech-icon-container:hover .tech-icon-wrapper {
+  transform: scale(1.05);
+}
+
+.capability-icon-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: transparent;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.capability-card:hover .capability-icon-container {
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.capability-icon-wrapper {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.capability-card:hover .capability-icon-wrapper {
+  transform: scale(1.08);
+}

@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: perceptionx-python
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: USE_MODAL_GPU
+        value: "true"
+      - key: MODAL_SECRET_NAME
+        value: perceptionx-secrets
+      - key: MODAL_APP_NAME
+        value: perceptionx-video-processor
+      - key: MODAL_TOKEN_ID
+        sync: false
+      - key: MODAL_TOKEN_SECRET
+        sync: false

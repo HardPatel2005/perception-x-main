@@ -1,0 +1,75 @@
+{
+  "_id": "6a11387fe38b38681adffb5d",
+  "filename": "1752421741259-original_jpg.jpg",
+  "mimetype": "image/jpeg",
+  "size": 564056,
+  "cloudinaryId": null,
+  "cloudinaryUrl": null,
+  "serviceType": "traffic-monitoring",
+  "userId": "6a11339f5bb9b27a178b7ab4",
+  "uploadDate": "2026-05-23T05:17:51.261Z",
+  "detectionEvents": [
+    {
+      "frameId": 0,
+      "timestamp": 0,
+      "detectedObjects": [
+        {
+          "class": "person",
+          "confidence": 0.8165833950042725,
+          "bbox": {
+            "x1": 566.8088989257812,
+            "y1": 457.4044189453125,
+            "x2": 618.445556640625,
+            "y2": 580.602783203125
+          }
+        },
+        {
+          "class": "person",
+          "confidence": 0.7985252737998962,
+          "bbox": {
+            "x1": 491.6068115234375,
+            "y1": 417.2469787597656,
+            "x2": 576.8114013671875,
+            "y2": 573.9921264648438
+          }
+        },
+        {
+          "class": "person",
+          "confidence": 0.7568329572677612,
+          "bbox": {
+            "x1": 689.3008422851562,
+            "y1": 452.5181884765625,
+            "x2": 733.0946044921875,
+            "y2": 565.064208984375
+          }
+        },
+        {
+          "class": "traffic light",
+          "confidence": 0.7411603331565857,
+          "bbox": {
+            "x1": 198.3014678955078,
+            "y1": 248.52886962890625,
+            "x2": 257.8606262207031,
+            "y2": 353.2006530761719
+          }
+        },
+        {
+          "class": "traffic light",
+          "confidence": 0.45065397024154663,
+          "bbox": {
+            "x1": 1070.422119140625,
+            "y1": 229.4585418701172,
+            "x2": 1099.232421875,
+            "y2": 327.00762939453125
+          }
+        }
+      ],
+      "inferenceTimeMs": 0,
+      "objectCounts": {
+        "person": 3,
+        "traffic light": 2
+      }
+    }
+  ],
+  "__v": 0
+}

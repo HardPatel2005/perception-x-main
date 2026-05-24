@@ -1,0 +1,35 @@
+# Python virtual environments
+.venv/
+venv/
+.venv310/
+
+# Bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs and temp files
+*.log
+logs/
+tmp/
+temp/
+
+# Build / package artifacts
+dist/
+build/
+*.egg-info/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
