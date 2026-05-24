@@ -14,7 +14,19 @@ const readViteEnv = (...keys) => {
   for (const key of keys) {
     const value = import.meta.env[key];
     if (value) {
-      return value;
+      // Reject obviously malformed hostnames (e.g. containing underscores)
+      try {
+        const u = new URL(value, 'http://example');
+        const hostname = u.hostname || '';
+        if (hostname.includes('_')) {
+          // treat as invalid
+          continue;
+        }
+        return value;
+      } catch (e) {
+        // If it's not a valid URL, skip it and continue to fallback
+        continue;
+      }
     }
   }
 
