@@ -18,6 +18,8 @@ services:
         sync: false
       - key: USE_MODAL_GPU
         value: "true"
+      - key: SKIP_MODEL_WARMUP
+        value: "true"
       - key: MODAL_SECRET_NAME
         value: perceptionx-secrets
       - key: MODAL_APP_NAME

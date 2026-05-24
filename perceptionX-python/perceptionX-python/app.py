@@ -71,6 +71,10 @@ MODEL_WEIGHTS_URL = os.environ.get("MODEL_WEIGHTS_URL", "")
 
 # Modal GPU configuration
 USE_MODAL_GPU = os.environ.get("USE_MODAL_GPU", "false").lower() == "true"
+SKIP_MODEL_WARMUP = os.environ.get(
+    "SKIP_MODEL_WARMUP",
+    "true" if USE_MODAL_GPU else "false"
+).lower() == "true"
 
 os.environ['MPLCONFIGDIR'] = '/tmp'
 os.environ["ULTRALYTICS_CONFIG_DIR"] = "/tmp/ultralytics"
@@ -591,6 +595,8 @@ async def save_processed_file(file_id, processed_bytes, detection_events=None):
 
 # --------------------- IMAGE PROCESSING ------------------------
 async def process_image(file_id, model, cloudinary_url=None, progress_callback_url=None, service_type='traffic-monitoring'):
+    if model is None:
+        model = load_model()
     data, _ = await fetch_file_from_mongo(file_id, cloudinary_url)
     if data is None:
         return False
@@ -661,6 +667,8 @@ async def process_video(file_id, model, cloudinary_url=None, progress_callback_u
     
     # Fall back to local processing (existing code)
     print("🖥️ Using local processing (CPU/GPU)")
+    if model is None:
+        model = load_model()
     # Initialize variables early to avoid UnboundLocalError
     actual_total_frames = 0
     actual_fps = 25
@@ -1125,8 +1133,6 @@ async def send_progress(callback_url, progress, message=None):
 
 # --------------------- PROCESS ROUTINE ------------------------
 async def run_process(file_id, file_type, cloudinary_url=None, progress_callback_url=None, service_type='traffic-monitoring'):
-    if _MODEL is None:
-        raise RuntimeError("YOLO model is not loaded")
     if file_type.startswith("image"):
         return await process_image(file_id, _MODEL, cloudinary_url, progress_callback_url, service_type)
     elif file_type.startswith("video"):
@@ -1148,7 +1154,11 @@ class ProcessRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     try:
-        load_model()
+        if SKIP_MODEL_WARMUP:
+            print("⏭️ Skipping YOLO warmup at startup (lazy load enabled)")
+        else:
+            load_model()
+            print("✅ YOLO model warmed up at startup")
         print("Service startup complete.")
     except Exception as e:
         print(f"❌ CRITICAL ERROR: {e}")
@@ -1159,9 +1169,12 @@ async def root():
 
 @app.get("/health")
 async def health():
-    if _MODEL is None:
-        raise HTTPException(status_code=503, detail="Model not ready")
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "modelLoaded": _MODEL is not None,
+        "lazyWarmup": SKIP_MODEL_WARMUP,
+        "modalGpu": USE_MODAL_GPU
+    }
 
 @app.get("/warmup")
 async def warmup():
@@ -1171,8 +1184,6 @@ async def warmup():
 
 @app.post("/process")
 async def process_endpoint(payload: ProcessRequest):
-    if _MODEL is None:
-        raise HTTPException(status_code=503, detail="YOLO model not ready")
     try:
         import time
         start_time = time.time()
