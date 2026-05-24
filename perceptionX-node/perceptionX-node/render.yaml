@@ -9,7 +9,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        value: https://perception-x-main-hard.onrender.com
+        value: https://perceptionx.me
+      - key: CORS_ORIGIN
+        value: https://perceptionx.me
       - key: VITE_PYTHON_API_URL
         value: https://perception-xprayesh-main.onrender.com
       - key: PYTHON_API_URL

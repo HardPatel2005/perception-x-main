@@ -35,7 +35,28 @@ const io = socketIo(server, {
     }
 });
 
-app.use(cors());
+// Configure CORS origins. Prefer explicit CORS_ORIGIN env var, then VITE_API_URL, otherwise allow all.
+const allowedOriginsRaw = process.env.CORS_ORIGIN || process.env.VITE_API_URL || '*';
+const allowedOrigins = allowedOriginsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow non-browser requests (curl, server-to-server) when origin is undefined
+        if (!origin) return callback(null, true);
+        if (allowedOriginsRaw === '*') return callback(null, true);
+        if (allowedOrigins.includes(origin) || allowedOrigins.includes(new URL(origin).origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+// Ensure preflight requests are handled before other middleware
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '500mb' })); // for JSON API forwarding (POST /detect)
 app.use("/api/auth", authRoutes); // Authentication routes
 app.use(express.urlencoded({ extended: true, limit: '500mb' }));
