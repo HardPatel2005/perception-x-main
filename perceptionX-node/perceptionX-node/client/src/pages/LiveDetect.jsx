@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useAuth } from '../context/AuthContext'
 import api from '../utils/axiosConfig'
+import { buildWebSocketUrl, getPythonApiBaseUrl } from '../utils/runtimeConfig'
 import Dashboard from '../components/dashboard/traffic-monitoring/TrafficMonitoringDashboard'
 import WildlifeDashboard from '../components/dashboard/wildlife-monitoring/WildlifeDashboard'
 import RestaurantDashboard from '../components/dashboard/restaurant-monitoring/RestaurantDashboard'
@@ -159,9 +160,11 @@ const LiveDetect = () => {
       streamRef.current = stream
 
       // Connect WebSocket to Python backend
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsHost = window.location.hostname
-      const wsUrl = `${wsProtocol}//${wsHost}:8001/ws/live-detect?service_type=${selectedServiceType}`
+      const wsUrl = buildWebSocketUrl(
+        getPythonApiBaseUrl(),
+        '/ws/live-detect',
+        { service_type: selectedServiceType }
+      )
       console.log(`🔗 Connecting to AI server: ${wsUrl}`);
       const ws = new WebSocket(wsUrl)
       wsRef.current = ws
@@ -234,7 +237,7 @@ const LiveDetect = () => {
 
       ws.onerror = (e) => {
         console.error('WebSocket error:', e)
-        setError('Connection to AI server failed (port 8001). Please ensure your Python backend is running.')
+            setError('Connection to AI server failed. Please ensure your Python backend is running.')
         setPhase('error')
         cleanup()
       }

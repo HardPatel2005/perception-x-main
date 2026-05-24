@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
+import { getNodeApiBaseUrl } from '../utils/runtimeConfig'
 
 export const useSocket = () => {
   const [socket, setSocket] = useState(null)
@@ -7,7 +8,7 @@ export const useSocket = () => {
 
   useEffect(() => {
     // Connect to socket.io - same as original EJS: var socket = io();
-    const socketInstance = io()
+    const socketInstance = io(getNodeApiBaseUrl())
     
     socketInstance.on('connect', () => {
       console.log('✅ Connected to server')

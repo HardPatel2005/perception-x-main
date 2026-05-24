@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getNodeApiBaseUrl } from './runtimeConfig';
 
 const api = axios.create({
-  baseURL: '/',
+  baseURL: getNodeApiBaseUrl(),
   timeout: 30000,
 });
 

@@ -3,13 +3,17 @@ services:
     name: perceptionx-node
     runtime: node
     plan: free
-    buildCommand: "npm ci && npm run build"
+    buildCommand: "npm install --legacy-peer-deps && npm run build"
     startCommand: "npm start"
     envVars:
       - key: NODE_ENV
         value: production
+      - key: VITE_API_URL
+        value: https://api.perceptionx.me
+      - key: VITE_PYTHON_API_URL
+        value: https://perception-xprayesh-main.onrender.com
       - key: PYTHON_API_URL
-        sync: false
+        value: https://perception-xprayesh-main.onrender.com
       - key: MONGO_URI
         sync: false
       - key: CLOUDINARY_CLOUD_NAME

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { buildHttpUrl, getNodeApiBaseUrl } from '../utils/runtimeConfig';
 
 const AuthContext = createContext();
 
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         verifyAbortControllerRef.current = new AbortController();
 
         try {
-            const response = await fetch('/api/auth/verify', {
+            const response = await fetch(buildHttpUrl(getNodeApiBaseUrl(), '/api/auth/verify'), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${tokenToVerify}`,

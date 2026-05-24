@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { useAuth } from '../context/AuthContext';
+import { buildHttpUrl, getNodeApiBaseUrl } from '../utils/runtimeConfig';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -37,7 +38,7 @@ const Signup = () => {
         }
 
         try {
-            const response = await fetch('/api/auth/signup', {
+            const response = await fetch(buildHttpUrl(getNodeApiBaseUrl(), '/api/auth/signup'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

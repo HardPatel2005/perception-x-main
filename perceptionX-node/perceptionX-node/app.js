@@ -1709,6 +1709,9 @@ app.get("/file/:id/processed", async (req, res) => {
 // MUST be last route to catch all unmatched paths
 app.get("*", (req, res) => {
     // Don't serve React for API routes or static files
+    if ((req.hostname || '').toLowerCase().startsWith('api.')) {
+        return res.status(404).json({ error: "Not found" });
+    }
     if (req.path.startsWith("/api") ||
         req.path.startsWith("/file") ||
         req.path.startsWith("/process") ||
