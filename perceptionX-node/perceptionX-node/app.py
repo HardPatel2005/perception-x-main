@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi import Request
 from pydantic import BaseModel
 import uvicorn
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from ultralytics import YOLO
@@ -214,6 +215,19 @@ async def log_requests(request: Request, call_next):
         print(f"❌ Error handling request {request.method} {request.url.path}: {e}")
         raise
 
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 405:
+        xff = request.headers.get("x-forwarded-for")
+        client_host = request.client.host if request.client else None
+        allow = request.headers.get("allow")
+        print(
+            f"⚠️ 405 Method Not Allowed for {request.method} {request.url.path} "
+            f"client={client_host} xff={xff} allow={allow}"
+        )
+    raise exc
+
 class ProcessRequest(BaseModel):
     fileId: str
     fileType: str
@@ -226,11 +240,11 @@ async def startup_event():
     except Exception as e:
         print(f"❌ CRITICAL ERROR: {e}")
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {"message": "YOLO backend is running!"}
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     if _MODEL is None:
         raise HTTPException(status_code=503, detail="Model not ready")
