@@ -7,6 +7,7 @@ import tempfile
 import subprocess
 from io import BytesIO
 from fastapi import FastAPI, HTTPException
+from fastapi import Request
 from pydantic import BaseModel
 import uvicorn
 
@@ -199,6 +200,20 @@ async def run_process(file_id, file_type):
 # --------------------- FASTAPI ------------------------
 app = FastAPI(title="YOLO Processing Service")
 
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    xff = request.headers.get("x-forwarded-for")
+    client_host = request.client.host if request.client else None
+    print(f"➡️ Incoming {request.method} {request.url.path} from client={client_host} xff={xff}")
+    try:
+        response = await call_next(request)
+        print(f"⬅️ Completed {request.method} {request.url.path} status={response.status_code}")
+        return response
+    except Exception as e:
+        print(f"❌ Error handling request {request.method} {request.url.path}: {e}")
+        raise
+
 class ProcessRequest(BaseModel):
     fileId: str
     fileType: str
@@ -231,14 +246,34 @@ async def warmup():
 async def process_endpoint(payload: ProcessRequest):
     if _MODEL is None:
         raise HTTPException(status_code=503, detail="YOLO model not ready")
+
+    async def _background_process(file_id, file_type):
+        try:
+            print(f"🔁 Background processing started for {file_id} ({file_type})")
+            ok = await run_process(file_id, file_type)
+            if ok:
+                print(f"✅ Background processing completed for {file_id}")
+            else:
+                print(f"❌ Background processing failed for {file_id}")
+        except Exception as e:
+            print(f"❌ Background processing exception for {file_id}: {e}")
+
+    # Schedule background processing and return immediately
+    asyncio.create_task(_background_process(payload.fileId, payload.fileType))
+    return {"status": "accepted", "fileId": payload.fileId}
+
+
+@app.get("/status/{file_id}")
+async def processing_status(file_id: str):
+    # Check whether processedData exists in MongoDB for the file
     try:
-        ok = await run_process(payload.fileId, payload.fileType)
-        if not ok:
-            raise HTTPException(status_code=500, detail="Processing failed")
-        return {"status": "ok", "fileId": payload.fileId}
-    except Exception as e:
-        print(f"❌ Processing failed for file {payload.fileId}: {e}")
-        raise HTTPException(status_code=500, detail=f"Processing failed. Reason: {e}")
+        obj = await collection.find_one({"_id": ObjectId(file_id)})
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid file id")
+    if not obj:
+        raise HTTPException(status_code=404, detail="File not found")
+    has_processed = bool(obj.get("processedData"))
+    return {"fileId": file_id, "processed": has_processed}
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=PORT, reload=False)
