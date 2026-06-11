@@ -1,3 +1,39 @@
+# Model weights — store separately, not in git
+*.pt
+*.pth
+*.onnx
+*.engine
+yolov11/
+models/
+
+# Dependencies — never commit these
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Video/media files
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Temp files from processing
+/tmp/
+tempfiles/
+
+# Env files
+.env
+.env.local
+.env.production
+
+# Build outputs
+/public/react-build/
+/dist/
+
+# Python virtual env
+.venv310/
 # Root ignore for the whole monorepo
 
 # Dependency folders
