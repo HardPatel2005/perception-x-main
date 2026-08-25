@@ -1,0 +1,40 @@
+name: SonarCloud to Linear
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "perceptionX-node/**"
+      - ".github/workflows/sonar-to-linear.yml"
+      - ".github/scripts/sonar-to-linear.js"
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  sync-sonar-to-linear:
+    runs-on: ubuntu-latest
+    env:
+      SONAR_HOST_URL: https://sonarcloud.io
+      SONAR_ORG: ${{ secrets.SONAR_ORG }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      SONAR_BRANCH: main
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+      LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.16.0
+          cache: npm
+
+      - name: Sync SonarCloud issues to Linear
+        run: node .github/scripts/sonar-to-linear.js

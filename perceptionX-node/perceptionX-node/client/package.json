@@ -8,12 +8,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^4.2.3",
     "@react-three/drei": "^9.88.13",
     "@react-three/fiber": "^8.15.11",
+    "@tanstack/react-query": "^5.101.0",
     "axios": "^1.6.2",
     "chart.js": "^4.4.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.33.0",
+    "graphql": "^16.14.2",
     "lucide-react": "^0.563.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

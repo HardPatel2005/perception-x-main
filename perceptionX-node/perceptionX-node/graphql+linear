@@ -1,0 +1,751 @@
+# GraphQL + Linear — Complete Guide
+### Hinglish mein — Simple aur Clear
+
+---
+
+## Pehle Samjho: REST vs GraphQL — Ek Real Example
+
+### REST API ka Problem (jo tum already jaante ho)
+
+```
+Postman mein tum ye karte ho:
+
+GET /users/123          → User milta hai (name, email, phone, address, bio...)
+GET /users/123/issues   → Uske issues milte hain (50 fields per issue)
+GET /issues/456/comments → Comments milte hain
+
+3 alag requests = 3 network calls
+Aur zyada data aata hai jitna chahiye = OVER-FETCHING
+Ya kam data aata hai = UNDER-FETCHING
+```
+
+### GraphQL ka Solution
+
+```
+Ek hi request mein exactly jo chahiye woh maango:
+
+POST https://api.linear.app/graphql
+
+{
+  user(id: "123") {
+    name          ← sirf ye chahiye
+    email         ← aur ye
+    assignedIssues {
+      title        ← aur sirf title
+    }
+  }
+}
+
+1 request = exactly jo maanga woh mila, kuch extra nahi
+```
+
+---
+
+## GraphQL Ka Mental Model — Restaurant Analogy
+
+```
+REST API    = Fixed thali — jo mile woh khao, choose nahi kar sakte
+GraphQL     = À la carte menu — exactly jo chahiye woh order karo
+
+Schema      = Menu card — kya available hai uski list
+Query       = Order dena — data maangna (READ)
+Mutation    = Kitchen ko change karna — data banana/badalna/hatana (WRITE)
+Resolver    = Chef — actually data fetch karta hai behind the scenes
+Endpoint    = Ek hi counter — saari cheezein wahan se milti hain
+
+REST mein:  /users, /issues, /comments — alag alag counters
+GraphQL mein: /graphql — ek hi counter, alag order
+```
+
+---
+
+## Linear API — Exactly Kya Hai?
+
+Linear ek **project management tool** hai (Jira jaisa, lekin better).  
+Unka poora API GraphQL pe based hai.
+
+```
+Linear App mein hota hai:
+  Teams      → Engineering, Design, Marketing
+  Projects   → "Q2 Launch", "Mobile App v2"
+  Issues     → Tasks/bugs (like Jira tickets)
+  Comments   → Issue pe discussion
+  Users      → Team members
+  Labels     → "Bug", "Feature", "Security"
+  States     → "Todo", "In Progress", "Done"
+```
+
+Tum Linear ka API use karke:
+- Apna custom dashboard bana sako
+- Slack bot bana sako jo issues create kare
+- GitHub PR se automatically issue close ho
+- Startup ke liye custom workflow automate karo
+
+---
+
+## Authentication — Sirf Ek Header
+
+```javascript
+// Personal API Key (apne scripts ke liye — no "Bearer")
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': process.env.LINEAR_API_KEY  // Direct key, no prefix
+};
+
+// OAuth Token (doosron ke liye app banao — "Bearer" chahiye)
+const headers = {
+  'Authorization': `Bearer ${accessToken}`
+};
+
+// Fark kab padta hai?
+// Personal key  → Sirf tumhara data, scripts/tools ke liye
+// OAuth          → "Login with Linear" feature, doosron ke liye app
+```
+
+---
+
+## Ek Base Function — Sabka Baap
+
+Ye ek function likhlo, baaki sab iske upar banta hai:
+
+```javascript
+// ye function ek baar likho, baar baar use karo
+async function linearQuery(query, variables = {}) {
+  const res = await fetch('https://api.linear.app/graphql', {
+    method: 'POST',                          // GraphQL mein HAMESHA POST
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': process.env.LINEAR_API_KEY
+    },
+    body: JSON.stringify({ query, variables }) // query + variables ek saath bhejo
+  });
+
+  const { data, errors } = await res.json();
+
+  if (errors) throw new Error(errors[0].message);
+  return data;
+}
+
+// Ab bas is function ko call karo
+const result = await linearQuery(`query { viewer { name email } }`);
+console.log(result.viewer.name);  // "Hard Patel"
+```
+
+---
+
+## 3 Main Concepts — Query, Mutation, Pagination
+
+---
+
+### 1. QUERY — Data Maangna (GET jaisa)
+
+```graphql
+# Sabse simple — apna naam aur email
+query {
+  viewer {
+    name
+    email
+  }
+}
+
+# Response:
+# {
+#   "data": {
+#     "viewer": {
+#       "name": "Hard Patel",
+#       "email": "hard@company.com"
+#     }
+#   }
+# }
+```
+
+```graphql
+# Ek specific issue fetch karo
+query {
+  issue(id: "ISS-123") {
+    title
+    priority
+    state {
+      name        # "In Progress"
+    }
+    assignee {
+      name        # "Hard Patel"
+    }
+  }
+}
+```
+
+```graphql
+# Apne saare assigned issues
+query {
+  viewer {
+    assignedIssues {
+      nodes {
+        id
+        title
+        priority
+        createdAt
+      }
+    }
+  }
+}
+```
+
+```javascript
+// JavaScript mein use karo
+const data = await linearQuery(`
+  query {
+    viewer {
+      assignedIssues {
+        nodes {
+          id
+          title
+          priority
+        }
+      }
+    }
+  }
+`);
+
+const myIssues = data.viewer.assignedIssues.nodes;
+console.log(`Mere paas ${myIssues.length} issues hain`);
+```
+
+---
+
+### 2. MUTATION — Data Banana/Badalna (POST/PUT/DELETE jaisa)
+
+```graphql
+# Naya issue create karo
+mutation {
+  createIssue(input: {
+    teamId: "TEAM-ID-HERE"
+    title: "Login page pe bug hai"
+    priority: 1        # 1 = Urgent
+  }) {
+    success
+    issue {
+      id
+      title
+    }
+  }
+}
+```
+
+```graphql
+# Issue update karo
+mutation {
+  updateIssue(
+    id: "ISS-123",
+    input: {
+      stateId: "STATE-DONE-ID"
+      priority: 3
+    }
+  ) {
+    success
+    issue {
+      id
+      title
+      state { name }
+    }
+  }
+}
+```
+
+```javascript
+// JavaScript mein mutation
+async function createBug(teamId, title, description) {
+  const data = await linearQuery(`
+    mutation CreateIssue($teamId: String!, $title: String!, $desc: String) {
+      createIssue(input: {
+        teamId: $teamId
+        title: $title
+        description: $desc
+        priority: 1
+        labelIds: ["LABEL-BUG-ID"]
+      }) {
+        success
+        issue {
+          id
+          title
+          url      # Linear mein directly open karne ka link
+        }
+      }
+    }
+  `, { teamId, title, desc: description });
+
+  if (data.createIssue.success) {
+    console.log(`Issue bana: ${data.createIssue.issue.url}`);
+    return data.createIssue.issue;
+  }
+}
+
+// Call karo
+await createBug("TEAM-ENG", "Payment gateway crash ho raha hai", "Steps to reproduce...");
+```
+
+---
+
+### 3. PAGINATION — Saare Results Lena (Relay Cursor Style)
+
+Linear mein ek baar mein max ~50 results milte hain. Zyada ke liye pagination chahiye.
+
+```
+Socho pages ki tarah:
+  Page 1 → 50 issues → endCursor = "abc123"
+  Page 2 → after: "abc123" → 50 more → endCursor = "def456"
+  Page 3 → after: "def456" → 30 issues → hasNextPage = false → DONE
+```
+
+```graphql
+# Pehla page
+query {
+  issues(first: 50) {
+    nodes {
+      id
+      title
+    }
+    pageInfo {
+      hasNextPage    # true/false — aur page hai?
+      endCursor      # "abc123" — next page ke liye yahi pass karo
+    }
+  }
+}
+
+# Agla page — endCursor pass karo
+query {
+  issues(first: 50, after: "abc123") {
+    nodes {
+      id
+      title
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+```
+
+```javascript
+// Saare issues ek baar mein fetch karo — automatic pagination
+async function getAllIssues(teamId) {
+  let allIssues = [];
+  let cursor = null;      // null = pehli baar, koi cursor nahi
+  let hasMore = true;
+
+  while (hasMore) {
+    const data = await linearQuery(`
+      query($teamId: String!, $after: String) {
+        team(id: $teamId) {
+          issues(first: 50, after: $after) {
+            nodes {
+              id
+              title
+              priority
+              state { name }
+              assignee { name }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+    `, { teamId, after: cursor });
+
+    const { nodes, pageInfo } = data.team.issues;
+
+    allIssues.push(...nodes);           // is page ke issues add karo
+    hasMore = pageInfo.hasNextPage;     // aur hai?
+    cursor = pageInfo.endCursor;        // cursor update karo
+
+    console.log(`${allIssues.length} issues fetch hue ab tak...`);
+  }
+
+  return allIssues;
+}
+
+const issues = await getAllIssues("TEAM-ENG-ID");
+console.log(`Total: ${issues.length} issues`);
+```
+
+---
+
+## Filtering — Exactly Kya Chahiye
+
+```graphql
+# Sirf urgent aur high priority issues (priority 1 aur 2)
+query {
+  issues(filter: {
+    priority: { lte: 2, neq: 0 }
+    # lte = less than or equal to 2
+    # neq = not equal to 0 (0 = unset/no priority)
+  }) {
+    nodes {
+      id
+      title
+      priority
+    }
+  }
+}
+```
+
+```graphql
+# Mujhe assign issues jo complete nahi hue
+query {
+  viewer {
+    assignedIssues(filter: {
+      state: {
+        type: { neq: "completed" }    # completed nahi
+      }
+    }) {
+      nodes {
+        id
+        title
+        state { name }
+      }
+    }
+  }
+}
+```
+
+```graphql
+# Security ya Bug label wale issues
+query {
+  viewer {
+    assignedIssues(filter: {
+      labels: {
+        name: { in: ["Security", "Bug"] }   # in = list mein se koi ek
+      }
+    }) {
+      nodes {
+        id
+        title
+        priority
+      }
+    }
+  }
+}
+```
+
+---
+
+## TanStack Query + GraphQL — Ek Saath Kaise Use Karte Hain
+
+TanStack Query React mein **caching, refetching, loading states** handle karta hai.  
+GraphQL **query language** hai jo data structure define karta hai.  
+Dono ek saath use ho sakte hain — ek doosre ke badle nahi.
+
+```javascript
+// TanStack Query + Linear GraphQL — React component mein
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+// 1. Custom hook — issues fetch karna
+function useMyIssues() {
+  return useQuery({
+    queryKey: ['my-issues'],          // cache key
+    queryFn: async () => {
+      const data = await linearQuery(`
+        query {
+          viewer {
+            assignedIssues(filter: {
+              state: { type: { neq: "completed" } }
+            }) {
+              nodes {
+                id title priority
+                state { name }
+              }
+            }
+          }
+        }
+      `);
+      return data.viewer.assignedIssues.nodes;
+    },
+    staleTime: 5 * 60 * 1000,        // 5 minute fresh rahega
+    refetchOnWindowFocus: true,       // tab switch karo to refresh
+  });
+}
+
+// 2. Mutation — naya issue banana
+function useCreateIssue() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ title, teamId }) => linearQuery(`
+      mutation($title: String!, $teamId: String!) {
+        createIssue(input: { title: $title, teamId: $teamId, priority: 2 }) {
+          success
+          issue { id title }
+        }
+      }
+    `, { title, teamId }),
+
+    onSuccess: () => {
+      // Issue bana → cache invalidate karo → fresh data fetch hoga
+      queryClient.invalidateQueries({ queryKey: ['my-issues'] });
+    }
+  });
+}
+
+// 3. Component mein use karo
+function IssuesDashboard() {
+  const { data: issues, isLoading } = useMyIssues();
+  const createIssue = useCreateIssue();
+
+  if (isLoading) return <Spinner />;
+
+  return (
+    <div>
+      {issues.map(issue => (
+        <div key={issue.id}>
+          <span>{issue.title}</span>
+          <span className={`priority-${issue.priority}`}>P{issue.priority}</span>
+        </div>
+      ))}
+
+      <button onClick={() => createIssue.mutate({
+        title: "Naya bug",
+        teamId: "TEAM-ID"
+      })}>
+        Issue Banao
+      </button>
+    </div>
+  );
+}
+```
+
+---
+
+## Apollo Client — Kya Hai Aur Kab Use Karo
+
+Apollo Client GraphQL ke liye ek **dedicated library** hai — TanStack Query + fetch dono ko replace karta hai.
+
+```
+Apollo Client kya karta hai:
+  ✓ GraphQL queries/mutations manage karta hai
+  ✓ In-memory cache (TanStack Query jaisa)
+  ✓ Auto refetch
+  ✓ Optimistic updates
+  ✓ Real-time subscriptions (WebSocket)
+
+TanStack Query kya karta hai:
+  ✓ Kisi bhi async function ka cache manage karta hai
+  ✓ REST, GraphQL, ya kuch bhi
+  ✗ GraphQL-specific features nahi (subscriptions, fragments)
+```
+
+```javascript
+// Apollo Client setup
+import { ApolloClient, InMemoryCache, gql, useQuery } from '@apollo/client';
+
+const client = new ApolloClient({
+  uri: 'https://api.linear.app/graphql',
+  cache: new InMemoryCache(),
+  headers: {
+    Authorization: process.env.LINEAR_API_KEY
+  }
+});
+
+// Apollo ka useQuery — automatic caching aur loading states
+const GET_MY_ISSUES = gql`
+  query GetMyIssues {
+    viewer {
+      assignedIssues {
+        nodes {
+          id
+          title
+          priority
+        }
+      }
+    }
+  }
+`;
+
+function IssueList() {
+  const { loading, error, data } = useQuery(GET_MY_ISSUES);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <ul>
+      {data.viewer.assignedIssues.nodes.map(issue => (
+        <li key={issue.id}>{issue.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+```
+Apollo use karo jab:
+  → Pure GraphQL project ho
+  → Real-time subscriptions chahiye ho
+  → Large team, GraphQL-first approach
+
+TanStack Query use karo jab:
+  → Mix of REST + GraphQL ho
+  → Already REST APIs bhi hain project mein
+  → Simple setup chahiye
+```
+
+---
+
+## Postman Ki Zaroorat Hai Ya Nahi?
+
+```
+REST API testing ke liye Postman:
+  GET /users, POST /issues — alag alag URLs
+  Postman mein collections banao, save karo
+
+GraphQL testing ke liye:
+  Ek hi URL: https://api.linear.app/graphql
+  Body mein alag queries
+
+GraphQL ke liye BETTER tools:
+  1. GraphiQL    → Browser mein IDE, autocomplete, schema explorer
+  2. Insomnia    → Postman jaisa but GraphQL support better
+  3. Altair      → Dedicated GraphQL client, free
+  4. Apollo Sandbox → apollo.io/sandbox, best for Apollo APIs
+
+Postman bhi GraphQL support karta hai ab:
+  New Request → GraphQL tab → Query likhne ka editor
+  To Postman ki zaroorat completely khatam nahi hoti
+
+Simple answer:
+  Personal scripts/learning → raw fetch() ya LinearClient SDK
+  Team collaboration       → Postman ya Insomnia (GraphQL mode mein)
+  Apollo projects          → Apollo Sandbox
+```
+
+---
+
+## Linear SDK — Ye Sab Automatically Karta Hai
+
+Manually query likhne ke bajaye Linear ka official SDK use karo:
+
+```javascript
+import { LinearClient } from '@linear/sdk';
+
+const linear = new LinearClient({
+  apiKey: process.env.LINEAR_API_KEY
+});
+
+// Ye internally GraphQL query run karta hai — tumhe likhna nahi padta
+const me = await linear.viewer;
+const myIssues = await me.assignedIssues();
+const firstIssue = myIssues.nodes[0];
+
+// Issue update karo — mutation automatically hogi
+await firstIssue.update({ stateId: "STATE-DONE-ID" });
+
+// Comment add karo
+await linear.createComment({
+  issueId: firstIssue.id,
+  body: "Ye fix ho gaya, PR #234 mein"
+});
+
+// Pagination — built-in helpers
+const allIssues = await linear.issues({ first: 50 });
+const nextPage = await allIssues.fetchNext();   // cursor automatically handle
+```
+
+---
+
+## Versioning — GraphQL mein Kaise Kaam Karta Hai?
+
+```
+REST mein versioning:
+  /api/v1/users
+  /api/v2/users   ← breaking change pe naya version
+  Purani apps v1 use karti rahen
+
+GraphQL mein versioning:
+  URL same rehta hai — api.linear.app/graphql
+  New fields add karo — purani queries todti nahi
+  Old fields "@deprecated" mark karo
+  Kabhi URL nahi badlata
+
+Example:
+  Old query: { user { name email } }          → still works
+  New fields: { user { name email avatar } }  → naya field add hua
+  Deprecated: { user { phone } }              → warning aata hai use karo toh
+```
+
+---
+
+## Job Mein Kya Kaam Aayega — Practical Skills
+
+### Junior Developer ke liye (Tumhara Level)
+
+```
+1. GraphQL queries likhna — data fetch karna
+   → useQuery with Apollo/TanStack
+   → Variables use karna (dynamic queries)
+
+2. Mutations likhna — data create/update
+   → useMutation
+   → onSuccess mein cache invalidate karna
+
+3. Error handling
+   → errors array check karna
+   → Loading states handle karna
+
+4. Pagination implement karna
+   → Cursor-based pagination samajhna
+   → "Load More" button banana
+
+5. Linear SDK use karna
+   → Team ke tools banana
+   → Issue tracking automate karna
+```
+
+### Startup mein Ye Banao (Portfolio ke liye)
+
+```
+1. Team Dashboard
+   → Linear se issues fetch karo
+   → Priority + assignee ke hisaab se sort karo
+   → React mein real-time updates (polling ya subscriptions)
+
+2. Slack Bot
+   → Slack command "/create-bug" → Linear mein issue banta hai
+   → Node.js + Linear GraphQL mutation
+
+3. GitHub Integration
+   → PR merge hone pe Linear issue automatically "Done" ho jaaye
+   → GitHub webhook → Linear mutation
+
+4. Sprint Report Generator
+   → Linear se sprint data fetch karo
+   → PDF/email mein summary bhejo
+   → Weekly automation
+```
+
+---
+
+## Flow Summary — Ek Line Mein Har Concept
+
+```
+GraphQL    = Ek endpoint pe apni marzi ka data maango
+Query      = Data padhna (GET)
+Mutation   = Data banana/badalna/hatana (POST/PUT/DELETE)
+Pagination = Cursor se page by page data lena
+Schema     = Poori API ki definition — kya available hai
+Resolver   = Behind the scenes jo actually data laata hai
+Apollo     = GraphQL ke liye dedicated React library
+TanStack   = Kisi bhi async ke liye cache library
+Linear SDK = Linear GraphQL ko wrap karta hai — queries likhni nahi padti
+Postman    = Still useful, but GraphQL mode mein ya Altair use karo
+Versioning = URL nahi badlata, fields add/deprecate hote hain
+
+REST se fark:
+  REST  → Multiple URLs, fixed response, versioned endpoints
+  GraphQL → Ek URL, flexible response, schema evolves gracefully
+```
+
+---
+
+*GraphQL + Linear Guide · Hinglish · June 2026*

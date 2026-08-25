@@ -3,7 +3,7 @@
  * Computes analytics for restaurant/kitchen monitoring from raw detection data
  */
 
-const FOOD_CLASSES     = ['pizza', 'hot dog', 'donut', 'sandwich', 'cake', 'banana', 'broccoli', 'carrot', 'orange', 'apple'];
+const FOOD_CLASSES     = ['pizza', 'hot dog', 'donut', 'sandwich', 'cake', 'banana', 'broccoli', 'carrot', 'o     range', 'apple'];
 const UTENSIL_CLASSES  = ['fork', 'knife', 'spoon', 'bowl', 'cup', 'wine glass', 'bottle'];
 const APPLIANCE_CLASSES = ['microwave', 'oven', 'toaster', 'refrigerator', 'sink'];
 const FURNITURE_CLASSES = ['dining table', 'chair'];

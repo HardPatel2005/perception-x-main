@@ -24,6 +24,7 @@ const { computeDetectionAnalytics } = require("./utils/analytics-detection.js");
 const { computeWildlifeAnalytics } = require("./utils/analytics-wildlife.js");
 const { computeRestaurantAnalytics } = require("./utils/analytics-restaurant.js");
 const authRoutes = require("./routes/auth.js");
+const linearRoutes = require("./routes/linear.js");
 const { authenticate } = require("./middleware/auth.js");
 
 const app = express();
@@ -59,6 +60,7 @@ app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '500mb' })); // for JSON API forwarding (POST /detect)
 app.use("/api/auth", authRoutes); // Authentication routes
+app.use("/api/linear", linearRoutes); // Linear GraphQL proxy routes
 app.use(express.urlencoded({ extended: true, limit: '500mb' }));
 app.use(methodOverride("_method"));
 
@@ -145,7 +147,7 @@ function checkSystemFFmpeg() {
         ffmpeg.stdout.on('data', (data) => {
             stdout += data.toString();
         });
-
+   
         ffmpeg.stderr.on('data', (data) => {
             stderr += data.toString();
         });
@@ -441,11 +443,8 @@ console.log('🧹 Analytics cache initialized and old entries cleared');
 // Analytics API - get specific file analytics
 app.get("/api/analytics/:fileId", authenticate, async (req, res) => {
     try {
-        const fileId = req.params.fileId;
-
-        // OPTIMIZATION: First fetch serviceType to build proper cache key
-        // This ensures cache is keyed by serviceType to prevent wrong dashboard from being shown
-        console.log(`🔍 Loading file serviceType from database for user: ${req.user._id}...`);
+      const fileId = req.params.fileId;
+console.log({ event: 'file_analytics_requested', fileId, serviceType });
         const fileServiceType = await File.findOne({ _id: fileId, userId: req.user._id })
             .select('serviceType')
             .lean()

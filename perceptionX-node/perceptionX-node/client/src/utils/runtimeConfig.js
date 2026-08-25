@@ -6,8 +6,16 @@ const getDefaultOrigin = () => {
   return 'http://localhost:3000';
 };
 
+// FIXED — limit input length before regex runs
 const normalizeBaseUrl = (value, fallback = getDefaultOrigin()) => {
-  return (value || fallback).trim().replace(/\/+$/, '');
+  const raw = (value || fallback);
+  if (typeof raw !== 'string' || raw.length > 2048) return fallback;
+  return raw.trim().replace(/\/+$/, '');
+};
+
+const parseBooleanEnv = (value) => {
+  if (typeof value !== 'string') return false;
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
 };
 
 const readViteEnv = (...keys) => {
@@ -38,9 +46,22 @@ export const getNodeApiBaseUrl = () => {
 };
 
 export const getPythonApiBaseUrl = () => {
+  const forceModalGpu = parseBooleanEnv(import.meta.env.VITE_FORCE_MODAL_GPU);
+
+  if (forceModalGpu) {
+    const modalBase = readViteEnv('VITE_MODAL_API_URL', 'VITE_PYTHON_API_URL', 'VITE_PYTHON_URL');
+    if (modalBase) {
+      return normalizeBaseUrl(modalBase);
+    }
+  }
+
   return normalizeBaseUrl(
-    readViteEnv('VITE_PYTHON_API_URL', 'VITE_PYTHON_URL', 'VITE_API_URL', 'VITE_NODE_API_URL')
+    readViteEnv('VITE_PYTHON_API_URL', 'VITE_PYTHON_URL', 'VITE_MODAL_API_URL', 'VITE_API_URL', 'VITE_NODE_API_URL')
   );
+};
+
+export const getProcessingApiBaseUrl = () => {
+  return getPythonApiBaseUrl();
 };
 
 export const buildHttpUrl = (baseUrl, pathname = '/') => {

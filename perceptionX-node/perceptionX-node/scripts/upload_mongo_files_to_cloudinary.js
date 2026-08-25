@@ -1,14 +1,4 @@
-#!/usr/bin/env node
-/*
-Uploads files stored in the `files` collection (binary in `data`) to Cloudinary
-and updates each document with `cloudinaryUrl` and `cloudinaryId`.
 
-Usage:
-  cd perceptionX-node
-  # ensure .env has MONGO_URI and Cloudinary vars
-  node scripts/upload_mongo_files_to_cloudinary.js
-
-*/
 require('dotenv').config();
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
